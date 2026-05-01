@@ -1,0 +1,2 @@
+var i=class{constructor(i={}){this.config=i}init(){this.config.disabled||console.log("[FrontGuard] Agent initialized")}},t={init(t){const n=new i(t);return n.init(),n}};export{t as default};
+//# sourceMappingURL=frontguard.es.js.map

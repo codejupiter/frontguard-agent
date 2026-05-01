@@ -1,0 +1,2 @@
+var FrontGuard=function(){var n=class{constructor(n={}){this.config=n}init(){this.config.disabled||console.log("[FrontGuard] Agent initialized")}};return{init(i){const t=new n(i);return t.init(),t}}}();
+//# sourceMappingURL=frontguard.iife.js.map
