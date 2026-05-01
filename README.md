@@ -7,7 +7,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-**[▶ Live Demo](#)** · **[Tests](#testing)** · **[Architecture](#architecture)**
+**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[Tests](#testing)** · **[Architecture](#architecture)**
 
 ---
 
