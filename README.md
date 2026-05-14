@@ -9,6 +9,8 @@
 
 **[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[Tests](#testing)** · **[Architecture](#architecture)**
 
+![FrontGuard Agent live detection demo](docs/screenshots/frontguard-agent-demo.png)
+
 ---
 
 ## What it does
