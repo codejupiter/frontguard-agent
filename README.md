@@ -7,7 +7,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[API](docs/API.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Tests](#testing)** · **[Architecture](#architecture)**
+**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[API](docs/API.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Release notes](docs/releases/frontguard-agent-v1.0.0.md)** · **[Security](SECURITY.md)** · **[Tests](#testing)**
 
 ![FrontGuard Agent live detection demo](docs/screenshots/frontguard-agent-demo.png)
 
@@ -79,6 +79,8 @@ The build emits:
 | `dist/types/` | TypeScript declarations for the public API |
 
 See [API.md](docs/API.md) for config, event schemas, lifecycle methods, and telemetry examples.
+
+Release readiness is tracked in [RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md), with release history in [CHANGELOG.md](CHANGELOG.md) and security reporting in [SECURITY.md](SECURITY.md).
 
 ## Live demo
 
@@ -179,6 +181,8 @@ npm run size
 ```
 
 The IIFE bundle is under 2KB gzipped at the time of writing, with headroom budgeted for the script and network monitors.
+
+Before publishing or creating a GitHub release, run the [release checklist](docs/RELEASE_CHECKLIST.md).
 
 ## Roadmap
 
