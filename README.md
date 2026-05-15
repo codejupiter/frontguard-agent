@@ -7,7 +7,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[API](docs/API.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Release notes](docs/releases/frontguard-agent-v1.0.0.md)** · **[Security](SECURITY.md)** · **[Tests](#testing)**
+**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[Suite](docs/FRONTGUARD_SUITE.md)** · **[API](docs/API.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Release notes](docs/releases/frontguard-agent-v1.0.0.md)** · **[Security](SECURITY.md)** · **[Tests](#testing)**
 
 ![FrontGuard Agent live detection demo](docs/screenshots/frontguard-agent-demo.png)
 
@@ -25,6 +25,8 @@ FrontGuard Agent drops into any web page as a single `<script>` tag and watches 
 Every detection produces a structured event: type, severity, timestamp, URL, and details. Events can be streamed to a backend, logged to console, or handled with a custom callback.
 
 This is the same category of tool as Cloudflare Page Shield and Datadog RUM — focused on a single, well-scoped problem: **detecting unauthorized client-side activity.**
+
+It is also the runtime layer of the [FrontGuard Suite](docs/FRONTGUARD_SUITE.md): the playground teaches the vulnerability, the agent detects the production behavior, and the roadmap points toward event ingestion and a security triage dashboard.
 
 ## Quick Start
 
@@ -191,10 +193,11 @@ Before publishing or creating a GitHub release, run the [release checklist](docs
 - [ ] **Telemetry reporter** — batched event delivery via `navigator.sendBeacon` with WebSocket fallback for real-time streaming
 - [ ] **Source map for stack traces** on injected script detection
 - [ ] **CSP report-only ingestion** — correlate with native browser CSP reports
+- [ ] **Suite ingestion contract** — typed event envelope for a future FrontGuard dashboard
 
 ## Related project
 
-[**FrontGuard Playground**](https://github.com/codejupiter/frontguard) — the educational counterpart to this agent. The playground demonstrates the *vulnerabilities* (XSS, broken auth, missing RBAC, DevTools bypass); this agent is the production tool for *detecting* them in the wild.
+[**FrontGuard Playground**](https://github.com/codejupiter/frontguard) — the educational counterpart to this agent. The playground demonstrates the *vulnerabilities* (XSS, broken auth, missing RBAC, DevTools bypass); this agent is the production tool for *detecting* them in the wild. The shared product roadmap is documented in [FrontGuard Suite](docs/FRONTGUARD_SUITE.md).
 
 ## License
 

@@ -179,6 +179,23 @@ setInterval(() => {
 }, 5000);
 ```
 
+## Suite Telemetry Contract
+
+FrontGuard Agent is transport-agnostic by design. In the broader [FrontGuard Suite](FRONTGUARD_SUITE.md), a production ingestion API would receive one or more `SecurityEvent` objects inside an application envelope:
+
+```ts
+interface FrontGuardEventEnvelope {
+  appId: string;
+  environment: 'production' | 'preview' | 'development';
+  release?: string;
+  sessionId?: string;
+  userId?: string;
+  events: SecurityEvent[];
+}
+```
+
+The browser package owns detection. The SaaS layer should own tenant authentication, schema validation, rate limits, durable storage, dashboards, retention, and alerting.
+
 ## Debug Handle
 
 In browsers, the active instance is exposed as:
@@ -188,4 +205,3 @@ window.__FRONTGUARD__
 ```
 
 This is intentionally useful for demos and manual QA. Production apps can ignore it.
-
