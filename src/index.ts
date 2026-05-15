@@ -1,8 +1,13 @@
 // src/index.ts
 import { DOMMonitor } from './dom-monitor';
-import type { FrontGuardConfig, SecurityEvent } from './types';
+import type {
+  FrontGuardConfig,
+  FrontGuardGlobal,
+  FrontGuardInstance,
+  SecurityEvent,
+} from './types';
 
-class FrontGuardAgent {
+class RuntimeFrontGuardAgent implements FrontGuardInstance {
   private config: FrontGuardConfig;
   private domMonitor: DOMMonitor | null = null;
   private events: SecurityEvent[] = [];
@@ -42,12 +47,19 @@ class FrontGuardAgent {
   }
 }
 
-export default {
+const FrontGuard: FrontGuardGlobal = {
   init(config?: FrontGuardConfig) {
-    const agent = new FrontGuardAgent(config);
+    const agent = new RuntimeFrontGuardAgent(config);
     agent.init();
     return agent;
   },
 };
 
-export type { FrontGuardConfig, SecurityEvent };
+export default FrontGuard;
+
+export type {
+  FrontGuardConfig,
+  FrontGuardGlobal,
+  FrontGuardInstance,
+  SecurityEvent,
+};

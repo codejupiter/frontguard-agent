@@ -1,11 +1,31 @@
 {
   "name": "frontguard-agent",
   "version": "1.0.0",
-  "description": "Lightweight runtime security agent for monitoring DOM, script, and network activity",
+  "description": "Lightweight runtime security agent for monitoring DOM and script injection activity",
   "main": "dist/frontguard.es.js",
+  "module": "dist/frontguard.es.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/frontguard.es.js",
+      "default": "./dist/frontguard.es.js"
+    },
+    "./iife": "./dist/frontguard.iife.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "unpkg": "dist/frontguard.iife.js",
+  "jsdelivr": "dist/frontguard.iife.js",
+  "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "dev": "vite",
     "typecheck": "tsc --noEmit --pretty false",
     "test": "vitest run",
@@ -16,10 +36,21 @@
     "security",
     "monitoring",
     "runtime",
-    "frontend"
+    "frontend",
+    "dom",
+    "xss",
+    "mutationobserver"
   ],
   "author": "Zoriah Cocio",
   "license": "MIT",
+  "homepage": "https://frontguard-agent.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codejupiter/frontguard-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/codejupiter/frontguard-agent/issues"
+  },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "jsdom": "^29.1.1",

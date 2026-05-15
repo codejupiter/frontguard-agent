@@ -5,11 +5,7 @@ export type EventSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type EventType =
   | 'dom.script-injected'
   | 'dom.iframe-injected'
-  | 'dom.suspicious-attribute'
-  | 'dom.unexpected-mutation'
-  | 'script.dynamic-create'
-  | 'network.unauthorized-domain'
-  | 'network.request';
+  | 'dom.suspicious-attribute';
 
 export interface SecurityEvent {
   type: EventType;
@@ -20,14 +16,22 @@ export interface SecurityEvent {
 }
 
 export interface FrontGuardConfig {
-  /** Endpoint to POST telemetry events to. Optional. */
-  endpoint?: string;
   /** Allowed script source domains. If set, scripts from other domains are flagged. */
   scriptAllowlist?: string[];
-  /** Allowed network request domains. If set, fetch/XHR to other domains are flagged. */
-  networkAllowlist?: string[];
   /** Callback fired for every event. Useful for debugging or custom handling. */
   onEvent?: (event: SecurityEvent) => void;
   /** Disable the agent (e.g., in dev). Default: false */
   disabled?: boolean;
+}
+
+export interface FrontGuardInstance {
+  /** Disconnects observers and stops collecting new events. */
+  stop(): void;
+  /** Returns the in-memory events captured by this agent instance. */
+  getEvents(): readonly SecurityEvent[];
+}
+
+export interface FrontGuardGlobal {
+  /** Starts a new runtime monitoring instance. */
+  init(config?: FrontGuardConfig): FrontGuardInstance;
 }

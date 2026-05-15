@@ -7,7 +7,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[Tests](#testing)** · **[Architecture](#architecture)**
+**[▶ Live Demo](https://frontguard-agent.vercel.app/)** · **[API](docs/API.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Tests](#testing)** · **[Architecture](#architecture)**
 
 ![FrontGuard Agent live detection demo](docs/screenshots/frontguard-agent-demo.png)
 
@@ -22,18 +22,20 @@ FrontGuard Agent drops into any web page as a single `<script>` tag and watches 
 - **DOM tampering** — suspicious attribute mutations like `onerror`, `onclick`, `srcdoc` added at runtime
 - **Container injection** — scripts hidden inside dynamically inserted DOM subtrees
 
-Every detection produces a structured event: type, severity, timestamp, and details. Events can be streamed to a backend, logged to console, or handled with a custom callback.
+Every detection produces a structured event: type, severity, timestamp, URL, and details. Events can be streamed to a backend, logged to console, or handled with a custom callback.
 
 This is the same category of tool as Cloudflare Page Shield and Datadog RUM — focused on a single, well-scoped problem: **detecting unauthorized client-side activity.**
 
-## Quick start
+## Quick Start
+
+Build from source:
 
 ```bash
 npm install
 npm run build
 ```
 
-Drop the built bundle into any HTML page:
+Drop the built IIFE bundle into any HTML page:
 
 ```html
 <script src="/dist/frontguard.iife.js"></script>
@@ -48,7 +50,35 @@ Drop the built bundle into any HTML page:
 </script>
 ```
 
-That's it. The agent runs in the background, snapshotting the trusted DOM at startup and flagging anything new.
+Or consume the ESM build from a workspace/package install:
+
+```ts
+import FrontGuard from 'frontguard-agent';
+
+const agent = FrontGuard.init({
+  scriptAllowlist: ['cdn.trusted.com'],
+  onEvent(event) {
+    navigator.sendBeacon('/security/events', JSON.stringify(event));
+  },
+});
+
+// Later, if this instance is route-scoped:
+agent.stop();
+```
+
+That's it. The agent runs in the background, snapshotting the trusted DOM at startup and flagging relevant runtime changes.
+
+## Package Surface
+
+The build emits:
+
+| File | Purpose |
+|---|---|
+| `dist/frontguard.es.js` | ESM import for apps, bundlers, and package consumers |
+| `dist/frontguard.iife.js` | Browser global build exposed as `window.FrontGuard` |
+| `dist/types/` | TypeScript declarations for the public API |
+
+See [API.md](docs/API.md) for config, event schemas, lifecycle methods, and telemetry examples.
 
 ## Live demo
 
@@ -64,6 +94,7 @@ npx serve .
 
 The agent is split into focused modules so each one is small enough to reason about and test independently.
 
+```txt
 frontguard-agent/
 ├── src/
 │   ├── index.ts          # Public API: FrontGuard.init({ ... })
@@ -72,8 +103,8 @@ frontguard-agent/
 ├── tests/
 │   └── dom-monitor.test.ts
 └── demo/
-└── index.html        # Interactive attack simulator
-
+    └── index.html        # Interactive attack simulator
+```
 
 ### How DOM detection works
 
@@ -90,8 +121,7 @@ interface SecurityEvent {
   type:
     | 'dom.script-injected'
     | 'dom.iframe-injected'
-    | 'dom.suspicious-attribute'
-    | 'dom.unexpected-mutation';
+    | 'dom.suspicious-attribute';
   severity: 'low' | 'medium' | 'high' | 'critical';
   timestamp: number;
   url: string;
@@ -115,6 +145,16 @@ FrontGuard.init({
 });
 ```
 
+The returned instance supports:
+
+```ts
+const agent = FrontGuard.init();
+agent.getEvents(); // readonly SecurityEvent[]
+agent.stop();      // disconnect the MutationObserver
+```
+
+For browser support, CSP notes, privacy posture, and known limitations, see [COMPATIBILITY.md](docs/COMPATIBILITY.md).
+
 ## Testing
 
 ```bash
@@ -128,6 +168,7 @@ The test suite covers the core detection paths using `vitest` + `jsdom`:
 - ✅ Does not flag scripts that existed at init time (baseline trust)
 - ✅ Respects the script allowlist (low severity for trusted CDNs)
 - ✅ Flags scripts nested inside an injected container
+- ✅ Covers the public API lifecycle: `init`, `disabled`, `stop`, `getEvents`, and the debug handle
 
 Each test uses `afterEach` to disconnect its `MutationObserver` — without this, observers from previous tests remain alive and cross-contaminate. (Real bug. Real fix. Real lesson.)
 
