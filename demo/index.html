@@ -244,12 +244,20 @@
           <label for="telemetry-app-id">App ID</label>
           <input id="telemetry-app-id" spellcheck="false" value="frontguard-agent-demo" />
         </div>
+        <div class="field">
+          <label for="telemetry-org-id">Org ID</label>
+          <input id="telemetry-org-id" spellcheck="false" value="frontguard-labs" />
+        </div>
+        <div class="field">
+          <label for="telemetry-project-id">Project ID</label>
+          <input id="telemetry-project-id" spellcheck="false" value="agent-demo" />
+        </div>
         <label class="checkbox-row">
           <input id="telemetry-enabled" type="checkbox" checked />
           Send detections to FrontGuard triage
         </label>
         <div class="status" id="telemetry-status">Waiting for a runtime event.</div>
-        <a class="suite-link" id="triage-link" href="https://frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo" target="_blank" rel="noreferrer">
+        <a class="suite-link" id="triage-link" href="https://frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo" target="_blank" rel="noreferrer">
           Open triage dashboard →
         </a>
       </div>
@@ -272,6 +280,8 @@
     const statHigh = document.getElementById('stat-high');
     const telemetryEndpoint = document.getElementById('telemetry-endpoint');
     const telemetryAppId = document.getElementById('telemetry-app-id');
+    const telemetryOrgId = document.getElementById('telemetry-org-id');
+    const telemetryProjectId = document.getElementById('telemetry-project-id');
     const telemetryEnabled = document.getElementById('telemetry-enabled');
     const telemetryStatus = document.getElementById('telemetry-status');
     const triageLink = document.getElementById('triage-link');
@@ -285,6 +295,12 @@
     telemetryAppId.value =
       localStorage.getItem('frontguard-agent.appId') ||
       telemetryAppId.value;
+    telemetryOrgId.value =
+      localStorage.getItem('frontguard-agent.orgId') ||
+      telemetryOrgId.value;
+    telemetryProjectId.value =
+      localStorage.getItem('frontguard-agent.projectId') ||
+      telemetryProjectId.value;
     telemetryEnabled.checked =
       localStorage.getItem('frontguard-agent.telemetryEnabled') !== 'false';
     updateTriageLink();
@@ -304,6 +320,16 @@
 
     telemetryAppId.addEventListener('input', () => {
       localStorage.setItem('frontguard-agent.appId', telemetryAppId.value.trim());
+      updateTriageLink();
+    });
+
+    telemetryOrgId.addEventListener('input', () => {
+      localStorage.setItem('frontguard-agent.orgId', telemetryOrgId.value.trim());
+      updateTriageLink();
+    });
+
+    telemetryProjectId.addEventListener('input', () => {
+      localStorage.setItem('frontguard-agent.projectId', telemetryProjectId.value.trim());
       updateTriageLink();
     });
 
@@ -341,6 +367,8 @@
 
       const endpoint = telemetryEndpoint.value.trim();
       const appId = telemetryAppId.value.trim() || 'frontguard-agent-demo';
+      const orgId = telemetryOrgId.value.trim() || 'frontguard-labs';
+      const projectId = telemetryProjectId.value.trim() || 'agent-demo';
       if (!endpoint) {
         setTelemetryStatus('Telemetry endpoint is missing.', 'error');
         return;
@@ -353,6 +381,8 @@
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
+            orgId,
+            projectId,
             appId,
             environment: location.hostname === 'frontguard-agent.vercel.app'
               ? 'production'
@@ -385,6 +415,8 @@
       try {
         const endpointUrl = new URL(telemetryEndpoint.value.trim());
         const dashboardUrl = new URL('/security-events', endpointUrl.origin);
+        dashboardUrl.searchParams.set('orgId', telemetryOrgId.value.trim() || 'frontguard-labs');
+        dashboardUrl.searchParams.set('projectId', telemetryProjectId.value.trim() || 'agent-demo');
         dashboardUrl.searchParams.set('appId', telemetryAppId.value.trim() || 'frontguard-agent-demo');
         triageLink.href = dashboardUrl.toString();
       } catch {

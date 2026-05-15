@@ -181,10 +181,12 @@ setInterval(() => {
 
 ## Suite Telemetry Contract
 
-FrontGuard Agent is transport-agnostic by design. In the broader [FrontGuard Suite](FRONTGUARD_SUITE.md), a production ingestion API would receive one or more `SecurityEvent` objects inside an application envelope:
+FrontGuard Agent is transport-agnostic by design. In the broader [FrontGuard Suite](FRONTGUARD_SUITE.md), a production ingestion API would receive one or more `SecurityEvent` objects inside a workspace-scoped application envelope:
 
 ```ts
 interface FrontGuardEventEnvelope {
+  orgId?: string;
+  projectId?: string;
   appId: string;
   environment: 'production' | 'preview' | 'development';
   release?: string;
@@ -205,7 +207,7 @@ https://frontguard-nine.vercel.app/api/security-events
 The matching triage view is:
 
 ```txt
-https://frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo
+https://frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo
 ```
 
 ## Debug Handle

@@ -58,6 +58,8 @@ A future FrontGuard backend can accept these events inside a tenant-aware envelo
 
 ```ts
 interface FrontGuardEventEnvelope {
+  orgId?: string;
+  projectId?: string;
   appId: string;
   environment: 'production' | 'preview' | 'development';
   release?: string;
@@ -67,7 +69,7 @@ interface FrontGuardEventEnvelope {
 }
 ```
 
-That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently. The hosted demo now uses this envelope to submit sample detections to the FrontGuard triage prototype at `frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo`.
+That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently. The hosted demo now uses this envelope to submit sample detections to the FrontGuard triage prototype at `frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo`.
 
 ## Agent Boundaries
 
