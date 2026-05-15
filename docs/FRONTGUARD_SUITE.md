@@ -19,8 +19,8 @@ This keeps the portfolio story product-grade: one project teaches the threat mod
 |---|---|---|
 | [FrontGuard Playground](https://github.com/codejupiter/frontguard) | Live Next.js app | Teach XSS, auth storage, API exposure, RBAC, and client-side bypasses. |
 | [FrontGuard Agent](https://github.com/codejupiter/frontguard-agent) | Package-ready library | Detect script injection, iframe injection, and suspicious DOM attribute mutations. |
-| Event ingestion API | Planned | Validate, rate-limit, batch, and store browser security events. |
-| Security dashboard | Planned | Triage events by application, release, session, source, and severity. |
+| Event ingestion API | Prototype | Validate, rate-limit, batch, and store browser security events. |
+| Security dashboard | Prototype | Triage events by application, release, session, source, and severity. |
 
 ## Architecture Direction
 
@@ -30,9 +30,9 @@ flowchart LR
   Agent --> Event["SecurityEvent"]
   Event --> Callback["onEvent callback"]
   Callback --> Transport["sendBeacon or fetch"]
-  Transport --> API["planned ingestion API"]
-  API --> Store["events database"]
-  Store --> Dashboard["planned triage dashboard"]
+  Transport --> API["FrontGuard /api/security-events"]
+  API --> Store["demo event store"]
+  Store --> Dashboard["/security-events triage"]
 ```
 
 The agent intentionally avoids owning transport, authentication, storage, or dashboard concerns. Those belong in the SaaS layer so this package can stay small, framework-agnostic, and safe to embed.
@@ -67,7 +67,7 @@ interface FrontGuardEventEnvelope {
 }
 ```
 
-That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently.
+That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently. The hosted demo now uses this envelope to submit sample detections to the FrontGuard triage prototype at `frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo`.
 
 ## Agent Boundaries
 
@@ -94,6 +94,7 @@ Near-term agent work should feed the larger suite:
 - Correlate agent events with CSP report-only ingestion.
 - Expose richer source metadata where browsers make it safe and reliable.
 - Keep package-size budgets and compatibility docs visible in every release.
+- Replace demo-only direct delivery with a documented reporter helper once durable storage and authentication exist in the suite.
 
 ## Interview Talking Points
 

@@ -70,6 +70,67 @@
       color: #ef4444;
     }
     button .label { color: #888; font-size: 0.75rem; margin-top: 0.25rem; }
+    input {
+      width: 100%;
+      padding: 0.7rem 0.75rem;
+      background: #0a0a0a;
+      border: 1px solid #2a2a2a;
+      color: #e0e0e0;
+      font-family: inherit;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4ade80;
+      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.1);
+    }
+    .telemetry {
+      margin-top: 1.5rem;
+      border-top: 1px solid #1f1f1f;
+      padding-top: 1.25rem;
+    }
+    .field { margin-bottom: 0.75rem; }
+    .field label {
+      display: block;
+      color: #888;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #aaa;
+      font-size: 0.8rem;
+      margin: 0.9rem 0;
+    }
+    .checkbox-row input {
+      width: auto;
+      accent-color: #4ade80;
+    }
+    .status {
+      border: 1px solid #1f1f1f;
+      border-radius: 6px;
+      padding: 0.65rem 0.75rem;
+      color: #777;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      min-height: 2.5rem;
+    }
+    .status.pending { border-color: #3b82f6; color: #93c5fd; }
+    .status.ok { border-color: #22c55e; color: #86efac; }
+    .status.error { border-color: #ef4444; color: #fca5a5; }
+    .suite-link {
+      display: inline-flex;
+      margin-top: 0.75rem;
+      color: #4ade80;
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    .suite-link:hover { text-decoration: underline; }
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -168,6 +229,30 @@
       <button data-attack="clear" style="margin-top: 1rem; border-color: #2a2a2a;">
         Clear Event Log
       </button>
+
+      <div class="telemetry">
+        <h2>Suite Telemetry</h2>
+        <div class="field">
+          <label for="telemetry-endpoint">Endpoint</label>
+          <input
+            id="telemetry-endpoint"
+            spellcheck="false"
+            value="https://frontguard-nine.vercel.app/api/security-events"
+          />
+        </div>
+        <div class="field">
+          <label for="telemetry-app-id">App ID</label>
+          <input id="telemetry-app-id" spellcheck="false" value="frontguard-agent-demo" />
+        </div>
+        <label class="checkbox-row">
+          <input id="telemetry-enabled" type="checkbox" checked />
+          Send detections to FrontGuard triage
+        </label>
+        <div class="status" id="telemetry-status">Waiting for a runtime event.</div>
+        <a class="suite-link" id="triage-link" href="https://frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo" target="_blank" rel="noreferrer">
+          Open triage dashboard →
+        </a>
+      </div>
     </section>
 
     <section>
@@ -185,32 +270,136 @@
     const statTotal = document.getElementById('stat-total');
     const statCritical = document.getElementById('stat-critical');
     const statHigh = document.getElementById('stat-high');
+    const telemetryEndpoint = document.getElementById('telemetry-endpoint');
+    const telemetryAppId = document.getElementById('telemetry-app-id');
+    const telemetryEnabled = document.getElementById('telemetry-enabled');
+    const telemetryStatus = document.getElementById('telemetry-status');
+    const triageLink = document.getElementById('triage-link');
 
     let counts = { total: 0, critical: 0, high: 0 };
+    const sessionId = loadSessionId();
+
+    telemetryEndpoint.value =
+      localStorage.getItem('frontguard-agent.telemetryEndpoint') ||
+      telemetryEndpoint.value;
+    telemetryAppId.value =
+      localStorage.getItem('frontguard-agent.appId') ||
+      telemetryAppId.value;
+    telemetryEnabled.checked =
+      localStorage.getItem('frontguard-agent.telemetryEnabled') !== 'false';
+    updateTriageLink();
 
     const agent = FrontGuard.init({
       scriptAllowlist: ['cdn.trusted.com'],
       onEvent: (event) => {
-        // Clear "no events" placeholder
-        if (counts.total === 0) logEl.innerHTML = '';
-
-        counts.total++;
-        if (event.severity === 'critical') counts.critical++;
-        if (event.severity === 'high') counts.high++;
-        statTotal.textContent = counts.total;
-        statCritical.textContent = counts.critical;
-        statHigh.textContent = counts.high;
-
-        const time = new Date(event.timestamp).toLocaleTimeString();
-        const entry = document.createElement('div');
-        entry.className = `log-entry severity-${event.severity}`;
-        entry.innerHTML = `
-          <div><span class="log-time">${time}</span> · <span class="log-type">${event.type}</span> · ${event.severity.toUpperCase()}</div>
-          <div class="log-details">${escapeHTML(JSON.stringify(event.details))}</div>
-        `;
-        logEl.prepend(entry);
+        renderEvent(event);
+        void sendSuiteTelemetry(event);
       },
     });
+
+    telemetryEndpoint.addEventListener('input', () => {
+      localStorage.setItem('frontguard-agent.telemetryEndpoint', telemetryEndpoint.value.trim());
+      updateTriageLink();
+    });
+
+    telemetryAppId.addEventListener('input', () => {
+      localStorage.setItem('frontguard-agent.appId', telemetryAppId.value.trim());
+      updateTriageLink();
+    });
+
+    telemetryEnabled.addEventListener('change', () => {
+      localStorage.setItem('frontguard-agent.telemetryEnabled', String(telemetryEnabled.checked));
+      setTelemetryStatus(
+        telemetryEnabled.checked ? 'Waiting for a runtime event.' : 'Telemetry paused.',
+        ''
+      );
+    });
+
+    function renderEvent(event) {
+      // Clear "no events" placeholder
+      if (counts.total === 0) logEl.innerHTML = '';
+
+      counts.total++;
+      if (event.severity === 'critical') counts.critical++;
+      if (event.severity === 'high') counts.high++;
+      statTotal.textContent = counts.total;
+      statCritical.textContent = counts.critical;
+      statHigh.textContent = counts.high;
+
+      const time = new Date(event.timestamp).toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry severity-${event.severity}`;
+      entry.innerHTML = `
+        <div><span class="log-time">${time}</span> · <span class="log-type">${event.type}</span> · ${event.severity.toUpperCase()}</div>
+        <div class="log-details">${escapeHTML(JSON.stringify(event.details))}</div>
+      `;
+      logEl.prepend(entry);
+    }
+
+    async function sendSuiteTelemetry(event) {
+      if (!telemetryEnabled.checked) return;
+
+      const endpoint = telemetryEndpoint.value.trim();
+      const appId = telemetryAppId.value.trim() || 'frontguard-agent-demo';
+      if (!endpoint) {
+        setTelemetryStatus('Telemetry endpoint is missing.', 'error');
+        return;
+      }
+
+      setTelemetryStatus('Sending event to FrontGuard triage...', 'pending');
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            appId,
+            environment: location.hostname === 'frontguard-agent.vercel.app'
+              ? 'production'
+              : 'development',
+            release: 'frontguard-agent-v1.0.0-demo',
+            sessionId,
+            events: [event],
+          }),
+          keepalive: true,
+        });
+
+        if (response.status !== 202) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        setTelemetryStatus(`Delivered ${event.type} to ${appId}.`, 'ok');
+        updateTriageLink();
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'unknown error';
+        setTelemetryStatus(`Delivery failed: ${message}`, 'error');
+      }
+    }
+
+    function setTelemetryStatus(message, state) {
+      telemetryStatus.textContent = message;
+      telemetryStatus.className = `status ${state}`.trim();
+    }
+
+    function updateTriageLink() {
+      try {
+        const endpointUrl = new URL(telemetryEndpoint.value.trim());
+        const dashboardUrl = new URL('/security-events', endpointUrl.origin);
+        dashboardUrl.searchParams.set('appId', telemetryAppId.value.trim() || 'frontguard-agent-demo');
+        triageLink.href = dashboardUrl.toString();
+      } catch {
+        triageLink.href = '#';
+      }
+    }
+
+    function loadSessionId() {
+      const existing = localStorage.getItem('frontguard-agent.sessionId');
+      if (existing) return existing;
+
+      const generated = `agent-demo-${crypto.randomUUID()}`;
+      localStorage.setItem('frontguard-agent.sessionId', generated);
+      return generated;
+    }
 
     function escapeHTML(s) {
       return s.replace(/[&<>"']/g, (c) => ({
@@ -249,6 +438,7 @@
         statCritical.textContent = '0';
         statHigh.textContent = '0';
         logEl.innerHTML = '<div class="empty">Cleared.</div>';
+        setTelemetryStatus('Local log cleared. Remote events remain in triage.', '');
       }
     });
   </script>

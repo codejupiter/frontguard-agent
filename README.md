@@ -88,6 +88,8 @@ Release readiness is tracked in [RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md
 
 The `demo/` directory contains an interactive page where you can trigger real attacks (script injection, iframe injection, attribute tampering, nested-container injection) and watch the agent detect each one in real time.
 
+The hosted demo also sends detected events to the FrontGuard Suite triage prototype by default. Open the matching dashboard stream at [frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo](https://frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo).
+
 ```bash
 npm run build
 npx serve .
@@ -193,7 +195,7 @@ Before publishing or creating a GitHub release, run the [release checklist](docs
 - [ ] **Telemetry reporter** — batched event delivery via `navigator.sendBeacon` with WebSocket fallback for real-time streaming
 - [ ] **Source map for stack traces** on injected script detection
 - [ ] **CSP report-only ingestion** — correlate with native browser CSP reports
-- [ ] **Suite ingestion contract** — typed event envelope for a future FrontGuard dashboard
+- [x] **Suite ingestion demo** — hosted demo events can POST into the FrontGuard triage prototype
 
 ## Related project
 

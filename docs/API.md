@@ -196,6 +196,18 @@ interface FrontGuardEventEnvelope {
 
 The browser package owns detection. The SaaS layer should own tenant authentication, schema validation, rate limits, durable storage, dashboards, retention, and alerting.
 
+The hosted demo currently uses this contract to POST detections to:
+
+```txt
+https://frontguard-nine.vercel.app/api/security-events
+```
+
+The matching triage view is:
+
+```txt
+https://frontguard-nine.vercel.app/security-events?appId=frontguard-agent-demo
+```
+
 ## Debug Handle
 
 In browsers, the active instance is exposed as:
