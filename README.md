@@ -88,7 +88,7 @@ Release readiness is tracked in [RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md
 
 The `demo/` directory contains an interactive page where you can trigger real attacks (script injection, iframe injection, attribute tampering, nested-container injection) and watch the agent detect each one in real time.
 
-The hosted demo also sends detected events to the FrontGuard Suite triage prototype by default. Open the matching dashboard stream at [frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo](https://frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo).
+The hosted demo also sends detected events to the FrontGuard Suite triage prototype by default. Open the matching dashboard stream at [frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo](https://frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo). If the receiver enables scoped write tokens, paste the token into the demo's Write Token field.
 
 ```bash
 npm run build

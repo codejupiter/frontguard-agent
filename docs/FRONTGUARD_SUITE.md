@@ -69,7 +69,7 @@ interface FrontGuardEventEnvelope {
 }
 ```
 
-That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently. The hosted demo now uses this envelope to submit sample detections to the FrontGuard triage prototype at `frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo`.
+That design gives teams a stable client contract while leaving backend choices open: route handlers, queues, Postgres, Redis rate limits, dashboards, alerts, and audit trails can evolve independently. The hosted demo now uses this envelope to submit sample detections to the FrontGuard triage prototype at `frontguard-nine.vercel.app/security-events?orgId=frontguard-labs&projectId=agent-demo&appId=frontguard-agent-demo`. If the receiver enables scoped write tokens, the demo can send one through `x-frontguard-event-token` from its optional Write Token field.
 
 ## Agent Boundaries
 

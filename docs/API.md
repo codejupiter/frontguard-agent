@@ -198,6 +198,8 @@ interface FrontGuardEventEnvelope {
 
 The browser package owns detection. The SaaS layer should own tenant authentication, schema validation, rate limits, durable storage, dashboards, retention, and alerting.
 
+When the FrontGuard Suite receiver enables scoped write tokens, send the token with either `Authorization: Bearer <token>` or `x-frontguard-event-token`. The hosted demo includes an optional Write Token field for this path and keeps the value in session storage.
+
 The hosted demo currently uses this contract to POST detections to:
 
 ```txt
