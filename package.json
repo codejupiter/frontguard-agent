@@ -55,11 +55,11 @@
     "url": "https://github.com/codejupiter/frontguard-agent/issues"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.9.0",
     "jsdom": "^29.1.1",
-    "terser": "^5.46.2",
+    "terser": "^5.47.1",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10",
-    "vitest": "^4.1.5"
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
   }
 }
